@@ -1,0 +1,31 @@
+<div class="printer_name"><a href="{{ printer.get_url }}">{{ printer.name }}</a> (<a href="{{ printer.get_history_url }}">History</a>)</div>
+<div class="printer_status">
+{{ operational_status }}
+{% if not operational_status == 'idle' and not operational_status == 'off' and not operational_status == 'not connected to network' %} 
+    {{ job_filename }} 
+    {% if operational_status == 'warming up to print' or operational_status == 'cooling after printing' %}
+        <table class="temperatures">
+        <tr><th></th><th>Extruder</th><th>Bed</th></tr>
+        <tr><th>Current</th><td>
+        {{ temperatures_extruder_current }}  &deg; C</td><td>{{ temperatures_bed_current }} &deg; C</td>
+        </tr>
+        <tr><th>Target</th><td>
+         {{ temperatures_extruder_target }}  &deg; C</td><td>{{ temperatures_bed_target }}  &deg; C</td></tr></table>
+    {% else %}
+        {% if not operational_status == 'finished printing' %}
+            {{ percentage_done }}% done 
+
+            {{ progress_printTimeLeft }} left
+        {% endif %}
+    {% endif %}
+{% if operational_status == 'warming up to print' and printer.is_ready_to_predict %}
+<strong>Time til print:</strong> {{ printer.til_print_min }} - 
+{{ printer.til_print_max }}
+{% endif %}
+{% if not operational_status == 'finished printing' and printer.is_ready_to_predict %}
+<strong>Print time:</strong> {{ printer.get_min_time }} - {{ printer.get_max_time }} <strong>Time so far:</strong> {{ printer.time_so_far }} <strong>Time left:</strong> {{ printer.time_left_min }} - 
+{{ printer.time_left_max }}
+{% endif %}
+{% endif %}
+
+</div>

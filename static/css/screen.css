@@ -1,0 +1,95 @@
+@import url('/static/css/reset.css');
+
+h1 {
+font-size:2em;
+color:green;
+font-weight:bold;
+}
+
+h1, p, table {
+margin-bottom:10px;
+}
+
+body {
+font:1em/1.5 Helvetica, arial, sans-serif;
+margin:10px;
+}
+
+strong {
+font-weight:bold;
+}
+
+.printer_name {
+padding:5px;
+}
+
+.printer_name a:link, .printer_name a:visited {
+color:#FFF;
+}
+
+.printer_name a:hover {
+text-decoration:none;
+}
+
+.printer_status {
+padding:5px;
+}
+.list img {
+width:160px;
+height:120px;
+}
+.list > tr {
+height:120px;
+}
+.printer_name {
+background:#393;
+}
+
+.list {
+width:100%;
+}
+
+.history th {
+background:#DCDCDC;
+font-weight:bold;
+width:100%;
+}
+
+.history th, .history td {
+padding:5px;
+}
+
+table {
+border-collapse:collapse;
+}
+td, th {
+border:1px solid green;
+vertical-align:top;
+text-align:left;
+}
+td a:link, td a:visited {
+font-weight:bold;
+}
+.status td, .status th {
+text-align:left;
+padding:5px;
+border:1px solid #CCC;
+}
+.temperatures th, .temperatures td {
+padding:5px;
+}
+.status th {
+background:#DCDCDC;
+}
+.list td.image {
+width:160px;
+padding:0;
+}
+.temperatures th {
+font-weight:bold;
+background:green;
+color:#FFF;
+}
+.temperatures {
+float:right;
+}

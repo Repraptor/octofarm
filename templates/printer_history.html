@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Printer History</title>
+<script src="/static/js/jquery-1.10.2.min.js"></script>
+<link href="/static/css/screen.css" rel="stylesheet" type="text/css"/>
+
+</head>
+<body>
+<a href="/">Homepage</a>
+<h1>{{ printer.name }}'s History</h1>
+<table class="history">
+<tr><th style="width:50%">Filename</th><th>Status</th><th style="width:100px">Started warming</th><th>Time to warm up</th><th>Started printing</th><th style="width:100px">Finished printing</th><th>Time to print</th><th style="width:100px">Filament</th><th>Image</th></tr>
+{% for date in printer.get_history_by_dates %}
+<tr><th colspan="9">{{ date.0 }}</th></tr>
+
+{% for event in date.1 %}
+<tr><td>{{ event.file_name }}</td><td>{{ event.status }}</td><td>{{ event.started_warming|date:"H:i" }}</td><td>{{ event.time_to_warm_up }}</td><td>{{ event.started_printing|date:"H:i" }}</td><td>{{ event.finished_printing|date:"H:i" }}</td><td>{{ event.time_to_print }}</td><td>{{ event.filament_amount_used }}</td><td><img src="/static/images/printer_jobs/printer_job_{{ event.id }}.jpg" width="150" style="margin:-5px;" /></td></tr>
+{% endfor %}
+{% endfor %}
+</table>
+</body>
+</html>

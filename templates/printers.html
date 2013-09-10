@@ -1,0 +1,149 @@
+<html>
+<head>
+<title>Printers</title>
+<script src="/static/js/jquery-1.10.2.min.js"></script>
+<link href="/static/css/screen.css" rel="stylesheet" type="text/css"/>
+
+</head>
+<body>
+<h1></h1>
+<div><span id="light">
+<input type="button" id="turn_lights_on" value="Turn lights on" /><input type="button" id="turn_lights_off" value="Turn lights off" /></span>
+<span id="fan"><input type="button" id="turn_fan_on" value="Turn fan on" /><input type="button" id="turn_fan_off" value="Turn fan off" /></span>
+</div>
+<P><strong>Temperature:</strong> <span id="temperature"></span>&deg;C <strong>Humidity:</strong> <span id="humidity"></span>% </p>
+<p><strong>Printers printing:</strong> <span id="printers_printing_percentage"></span>% (<span id="printers_printing"></span>/<span id="printers"></span>)</p>
+<div id="info"></div>
+<table class="list">
+
+{% for printer in object_list %}
+<tr><td id="printer_status_{{ printer.id }}">
+</td><td class="image">
+<a href="http://{{ printer.external_streamer_address }}/" id="image_{{ forloop.counter0 }}">
+
+</a>
+</td></tr>
+{% endfor %}
+
+
+<script>
+var printer_ids = [{% for printer in object_list %}{{ printer.id }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+$.ajaxSetup ({
+    // Disable caching of AJAX responses
+    cache: false
+});
+function getStatus(printerId){
+    console.log('Printer id: ' + printerId);
+    var data = $.ajax({
+        type: "GET",
+        url: '/get_printer_status_message/'+printerId+'/',
+        async: false
+    }).complete(function(){
+        setTimeout(function(){getStatus(printerId);}, 1000);
+    }).responseText;
+    console.log(data);
+    $('#printer_status_'+printerId).html(data);
+}
+function getStatus2() {
+    var data = $.ajax({
+        type: "GET",
+        url: '/json/',
+        async: false
+    }).success(function(data){
+        if (data.temperature != '-999.0\r' && data.temperature != -999) {
+            $('#temperature').text(data.temperature);
+            $('#humidity').text(data.humidity);
+        }
+        for (var i = 0; i < data.printers.length; i++) {
+            var printerId = printer_ids[i];
+            $('#printer_status_'+printerId).html(data.printers[i]);
+        } console.log('light: ' + data.light);
+        if (data.light == 0) {
+           
+            $('#light').html('<input type="button" id="turn_lights_on" value="Turn lights on" />');
+        } else {
+            $('#light').html('<input type="button" id="turn_lights_off" value="Turn lights off" />');
+        }
+        if (data.fan == 0) {
+           
+            $('#fan').html('<input type="button" id="turn_fan_on" value="Turn fan on" />');
+        } else {
+            $('#fan').html('<input type="button" id="turn_fan_off" value="Turn fan off" />');
+        }
+    }).complete(function(){
+        
+        setTimeout(function(){getStatus2();}, 1000);
+    }).responseText;
+    //console.log(data);
+    //console.log(data.printers);
+    //for (var i = 0; i < data.printers.length; i++) {
+    //    printerID = i
+    //    $('#printer_status_'+printerId).html(data.printers[printerID]);
+    //}
+}
+var addresses = [{% for printer in object_list %}'{{ printer.external_streamer_address }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+console.log('test');
+function updateStatus() {
+    $.get('/json/', function(data) {
+      $('h1').html(data.name);
+      //data.on_printers 
+      for (var i = 0; i < data.on_printers_external_streaming_addresses.length; i++) {
+        var printerid = data.on_printers_external_html_ids[i];
+        console.log('html ids ' + data.on_printers_external_html_ids);
+        $('#image_' + printerid).html('<img src="http://' + data.on_printers_external_streaming_addresses[i] + '/?action=stream" />');
+        console.log($('#image_' + i).html());
+      }
+      // # of printers printing
+      $('#printers_printing_percentage').html(data.stats.printers_printing_percentage);
+      $('#printers_printing').html(data.stats.printers_printing);
+      $('#printers').html(data.stats.printers_printing);
+    });
+    //for (var i = 0; i < printer_ids.length; i++) {
+     // (function (i){
+      //  getStatus(printer_ids[i]);
+        //$.get('/get_printer_status_message/'+printer_ids[i]+'/', function(data) {
+        //  $('#printer_status_'+printer_ids[i]).html(data);
+
+        //  console.log(data)
+        //  console.log('id: #printer_status_'+printer_ids[i]);
+        //  console.log('current:' + $('#printer_status_'+printer_ids[i]).html());
+        //});
+     // }(i);
+    //}
+    //for (var i = 0; i < printer_ids.length; i++) {
+    //    var printer_id = printer_ids[i];
+    //    getStatus(printer_id);
+    //}
+}
+
+$(function() {
+  updateStatus();
+  getStatus2();
+  //setInterval(updateStatus, 1000);
+  console.log(addresses.length);
+  //for (var i = 0; i < addresses.length; i++) {
+  //  $('#image_' + i).html('<img src="http://' + addresses[i] + '/?action=stream" />');
+  //  console.log($('#image_' + i).html());
+  //}
+  $(document).on("click", "#turn_lights_on", function() {
+    console.log('clicked on');
+    $.get('/turn_lights_on/');
+  });
+  $(document).on("click", "#turn_lights_off", function() {
+    console.log('clicked off');
+    $.get('/turn_lights_off/');
+  });
+  $(document).on("click", "#turn_fan_on", function() {
+    console.log('clicked on');
+    $.get('/turn_fan_on/');
+  });
+  $(document).on("click", "#turn_fan_off", function() {
+    console.log('clicked off');
+    $.get('/turn_fan_off/');
+  });
+});
+
+</script>
+<!--<img src="http://10.0.1.25:8080/?action=stream" width="100%" />-->
+</body>
+</html>
